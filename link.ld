@@ -2,8 +2,8 @@
 /* 1K = 1 KiBi = 1024 bytes */
 MEMORY
 {
-  FLASH : ORIGIN = 0x00000000, LENGTH = 256K
-  RAM : ORIGIN = 0x20000000, LENGTH = 64K
+  FLASH : ORIGIN = 0x08000000, LENGTH = 2M
+  RAM : ORIGIN = 0x20000000, LENGTH = 192K
 }
 
 /* The entry point is the reset handler */
@@ -26,6 +26,27 @@ SECTIONS
   {
     *(.text .text.*);
   } > FLASH
+
+  .rodata :
+  {
+      *(.rodata .rodata.*);
+  } > FLASH
+
+  .bss (NOLOAD):
+  {
+    _sbss = .;
+    *(.bss .bss.*);
+    _ebss = .;
+  } > RAM
+
+  .data : AT(ADDR(.rodata) + SIZEOF(.rodata))
+  {
+    _sdata = .;
+    *(.data .data.*);
+    _edata = .;
+  } > RAM
+
+  _sidata = LOADADDR(.data);
 
   /DISCARD/ :
   {
